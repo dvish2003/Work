@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerDAOImpl implements CustomerDAO {
+
     public ArrayList<CustomerDTO> getAllCustomer() throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
         Statement stm = connection.createStatement();
@@ -87,14 +88,7 @@ public class CustomerDAOImpl implements CustomerDAO {
         pstm.setString(1, newValue + "");
         ResultSet rst = pstm.executeQuery();
         rst.next();
-/*
-        ArrayList<CustomerDTO> allCustomer = new ArrayList<>();
-        while ( rst.next()) {
-            CustomerDTO customerDTO = new CustomerDTO(newValue + "", rst.getString("name"), rst.getString("address"));
-       allCustomer.add(customerDTO);
-        }
-        return allCustomer;
-*/
+
     }
     public ArrayList<String> LoadAllCustomerIds() throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();

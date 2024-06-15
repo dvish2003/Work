@@ -6,7 +6,7 @@ import com.example.layeredarchitecture.model.ItemDTO;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ItemDAOImpl {
+public class ItemDAOImpl implements  ItemDAO {
 
     public ArrayList<ItemDTO> getAllItem() throws SQLException, ClassNotFoundException {
         Connection connection = DBConnection.getDbConnection().getConnection();
@@ -129,35 +129,3 @@ public ItemDTO findItemCom(String newItemCode) throws SQLException, ClassNotFoun
 
 }
 }
-/*  public boolean updateItem(int qtyOnHand,String code,ItemDTO item) throws SQLException {
-         Connection connection = null;
-         try {
-             connection = DBConnection.getDbConnection().getConnection();
-             connection.setAutoCommit(false);
-             PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET description=?, unitPrice=?, qtyOnHand=? WHERE code=?");
-             pstm.setString(1, item.getDescription());
-             pstm.setBigDecimal(2, item.getUnitPrice());
-             pstm.setInt(3, qtyOnHand);
-             pstm.setString(4, code);
-
-             if (!(pstm.executeUpdate() > 0)) {
-                 connection.rollback();
-                 connection.setAutoCommit(true);
-                 return false;
-             }
-             connection.commit();
-             connection.setAutoCommit(true);
-             return true;
-         } catch (SQLException throwables) {
-             if (connection != null) {
-                 connection.rollback();
-                 connection.setAutoCommit(true);
-             }
-             throwables.printStackTrace();
-             return false;
-         } catch (ClassNotFoundException e) {
-             throw new RuntimeException(e);
-         }
-     }*/
-
-

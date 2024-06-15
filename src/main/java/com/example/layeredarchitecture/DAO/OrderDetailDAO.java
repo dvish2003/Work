@@ -11,8 +11,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class OrderDetailDAO {
+public class OrderDetailDAO implements OrderDetailsDAO {
   private Connection connection = DBConnection.getDbConnection().getConnection();
+    ItemDAO itemDAO = new ItemDAOImpl();
 
     public OrderDetailDAO() throws SQLException, ClassNotFoundException {
     }
@@ -29,6 +30,7 @@ public boolean addOrderDetails(String orderId, List<OrderDetailDTO> orderDetails
 
 
             ItemDTO item = PlaceOrderFormController.findItem(detail.getItemCode());
+
             item.setQtyOnHand(item.getQtyOnHand() - detail.getQty());
             ItemDAOImpl itemDAO = new ItemDAOImpl();
             int Done = itemDAO.updateItem(item.getQtyOnHand(), item.getCode(), item);
@@ -43,7 +45,7 @@ public boolean addOrderDetails(String orderId, List<OrderDetailDTO> orderDetails
         return true;
     }
 
-    private Boolean saveOrderDetails(String orderId, OrderDetailDTO orderDetailDTO) throws SQLException {
+    public Boolean saveOrderDetails(String orderId, OrderDetailDTO orderDetailDTO) throws SQLException {
         PreparedStatement stm = connection.prepareStatement("INSERT INTO OrderDetails (oid, itemCode, unitPrice, qty) VALUES (?,?,?,?)");
 
         stm.setString(1, orderId);

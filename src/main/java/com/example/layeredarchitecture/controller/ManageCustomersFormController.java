@@ -38,7 +38,8 @@ public class ManageCustomersFormController {
     public TextField txtCustomerAddress;
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
-    CustomerDAO customerDAOimpl = new CustomerDAOImpl();
+
+    CustomerDAO customerDAO = new CustomerDAOImpl();
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
         tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -78,7 +79,7 @@ public class ManageCustomersFormController {
 //                tblCustomers.getItems().add(new CustomerTM(rst.getString("id"), rst.getString("name"), rst.getString("address")));
 //            }
           //  CustomerDAOImpl customerDTO = new CustomerDAOImpl();
-            ArrayList<CustomerDTO> CustomerDTOS = customerDAOimpl.getAllCustomer();
+            ArrayList<CustomerDTO> CustomerDTOS = customerDAO.getAllCustomer();
              for (CustomerDTO customerDTO1 : CustomerDTOS ){
                  tblCustomers.getItems().add(new CustomerTM(customerDTO1.getId(),customerDTO1.getName(),customerDTO1.getAddress()));
              }
@@ -158,7 +159,7 @@ public class ManageCustomersFormController {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
 
-                customerDAOimpl.saveCustomer(customerDTO);
+                customerDAO.saveCustomer(customerDTO);
 //                Connection connection = DBConnection.getDbConnection().getConnection();
 //                PreparedStatement pstm = connection.prepareStatement("INSERT INTO Customer (id,name, address) VALUES (?,?,?)");
 //                pstm.setString(1, id);
@@ -180,7 +181,7 @@ public class ManageCustomersFormController {
                 if (!existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
-                customerDAOimpl.updateCustomer(customerDTO);
+                customerDAO.updateCustomer(customerDTO);
 
 //                Connection connection = DBConnection.getDbConnection().getConnection();
 //                PreparedStatement pstm = connection.prepareStatement("UPDATE Customer SET name=?, address=? WHERE id=?");
@@ -212,7 +213,7 @@ public class ManageCustomersFormController {
         return pstm.executeQuery().next();*/
 
       //  CustomerDAOImpl customerDAOimpl = new CustomerDAOImpl();
-        customerDAOimpl.existCustomer(id);
+        customerDAO.existCustomer(id);
         return false;
     }
 
@@ -254,7 +255,7 @@ public class ManageCustomersFormController {
 
 */
         //    CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-            String id = customerDAOimpl.generateNewId();
+            String id = customerDAO.generateNewId();
             if (id == null) {
                 return "C00-001";
 //                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;

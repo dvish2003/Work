@@ -1,5 +1,6 @@
 package com.example.layeredarchitecture.controller;
 
+import com.example.layeredarchitecture.DAO.ItemDAO;
 import com.example.layeredarchitecture.DAO.ItemDAOImpl;
 import com.example.layeredarchitecture.db.DBConnection;
 import com.example.layeredarchitecture.model.ItemDTO;
@@ -36,6 +37,7 @@ public class ManageItemsFormController {
     public TableView<ItemTM> tblItems;
     public TextField txtUnitPrice;
     public JFXButton btnAddNewItem;
+    ItemDAO itemDAO = new ItemDAOImpl();
 
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
@@ -75,7 +77,6 @@ public class ManageItemsFormController {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM Item");*/
 
-            ItemDAOImpl itemDAO = new ItemDAOImpl();
             ArrayList<ItemDTO> allItem = itemDAO.getAllItem();
             for(ItemDTO itemDTO : allItem){
                 tblItems.getItems().add(new ItemTM(itemDTO.getCode(),itemDTO.getDescription(),itemDTO.getUnitPrice(),itemDTO.getQtyOnHand()));
@@ -134,7 +135,6 @@ public class ManageItemsFormController {
     public void btnDelete_OnAction(ActionEvent actionEvent) {
         /*Delete Item*/
         String code = tblItems.getSelectionModel().getSelectedItem().getCode();
-        ItemDAOImpl itemDAO = new ItemDAOImpl();
         try {
             if (!existItem(code)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
@@ -178,7 +178,6 @@ public class ManageItemsFormController {
 
 
         ItemDTO itemDTO = new ItemDTO(code,description,unitPrice,qtyOnHand);
-        ItemDAOImpl itemDAO = new ItemDAOImpl();
 
         if (btnSave.getText().equalsIgnoreCase("save")) {
             try {
@@ -239,7 +238,6 @@ public class ManageItemsFormController {
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
         pstm.setString(1, code);
         return pstm.executeQuery().next();*/
-        ItemDAOImpl itemDAO = new ItemDAOImpl();
         itemDAO.exist(code);
         return false;
 
@@ -250,7 +248,6 @@ public class ManageItemsFormController {
         try {
          /*   Connection connection = DBConnection.getDbConnection().getConnection();
             ResultSet rst = connection.createStatement().executeQuery("SELECT code FROM Item ORDER BY code DESC LIMIT 1;");*/
-            ItemDAOImpl itemDAO = new ItemDAOImpl();
                 String id = itemDAO.generateNextId();
             if (id == null ) {
                 return "I00-001";
