@@ -1,8 +1,9 @@
 package com.example.layeredarchitecture.controller;
 
-import com.example.layeredarchitecture.DAO.CustomerDAO;
-import com.example.layeredarchitecture.DAO.CustomerDAOImpl;
-import com.example.layeredarchitecture.db.DBConnection;
+import com.example.layeredarchitecture.BO.CustomerBo;
+import com.example.layeredarchitecture.BO.CustomerBoImpl;
+import com.example.layeredarchitecture.DAO.Customer.CustomerDAO;
+import com.example.layeredarchitecture.DAO.Custom.Implement.CustomerDAOImpl;
 import com.example.layeredarchitecture.model.CustomerDTO;
 import com.example.layeredarchitecture.view.tdm.CustomerTM;
 import com.jfoenix.controls.JFXButton;
@@ -39,7 +40,10 @@ public class ManageCustomersFormController {
     public TableView<CustomerTM> tblCustomers;
     public JFXButton btnAddNewCustomer;
 
-    CustomerDAO customerDAO = new CustomerDAOImpl();
+   // CustomerDAO customerDAO = new CustomerDAOImpl();
+    //Business layer
+    CustomerBo customerBo = new CustomerBoImpl();
+
     public void initialize() {
         tblCustomers.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("id"));
         tblCustomers.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -79,7 +83,7 @@ public class ManageCustomersFormController {
 //                tblCustomers.getItems().add(new CustomerTM(rst.getString("id"), rst.getString("name"), rst.getString("address")));
 //            }
           //  CustomerDAOImpl customerDTO = new CustomerDAOImpl();
-            ArrayList<CustomerDTO> CustomerDTOS = customerDAO.getAllCustomer();
+            ArrayList<CustomerDTO> CustomerDTOS = customerBo.getAllCustomer();
              for (CustomerDTO customerDTO1 : CustomerDTOS ){
                  tblCustomers.getItems().add(new CustomerTM(customerDTO1.getId(),customerDTO1.getName(),customerDTO1.getAddress()));
              }
@@ -155,11 +159,11 @@ public class ManageCustomersFormController {
         if (btnSave.getText().equalsIgnoreCase("save")) {
             /*Save Customer*/
             try {
-                if (existCustomer(id)) {
+                if (!existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, id + " already exists").show();
                 }
 
-                customerDAO.saveCustomer(customerDTO);
+                customerBo.save(customerDTO);
 //                Connection connection = DBConnection.getDbConnection().getConnection();
 //                PreparedStatement pstm = connection.prepareStatement("INSERT INTO Customer (id,name, address) VALUES (?,?,?)");
 //                pstm.setString(1, id);
@@ -181,7 +185,7 @@ public class ManageCustomersFormController {
                 if (!existCustomer(id)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such customer associated with the id " + id).show();
                 }
-                customerDAO.updateCustomer(customerDTO);
+                customerBo.update(customerDTO);
 
 //                Connection connection = DBConnection.getDbConnection().getConnection();
 //                PreparedStatement pstm = connection.prepareStatement("UPDATE Customer SET name=?, address=? WHERE id=?");
@@ -213,8 +217,8 @@ public class ManageCustomersFormController {
         return pstm.executeQuery().next();*/
 
       //  CustomerDAOImpl customerDAOimpl = new CustomerDAOImpl();
-        customerDAO.existCustomer(id);
-        return false;
+        customerBo.exist(id);
+        return true;
     }
 
 /*public void existCustomer(){
@@ -232,11 +236,7 @@ public class ManageCustomersFormController {
 
             CustomerDAOImpl customerDAO = new CustomerDAOImpl();
             customerDAO.delete(id);
-          /*  Connection connection = DBConnection.getDbConnection().getConnection();
-            PreparedStatement pstm = connection.prepareStatement("DELETE FROM Customer WHERE id=?");
-            pstm.setString(1, id);
-            pstm.executeUpdate();
-*/
+
             tblCustomers.getItems().remove(tblCustomers.getSelectionModel().getSelectedItem());
             tblCustomers.getSelectionModel().clearSelection();
             initUI();
@@ -255,7 +255,7 @@ public class ManageCustomersFormController {
 
 */
         //    CustomerDAOImpl customerDAO = new CustomerDAOImpl();
-            String id = customerDAO.generateNewId();
+            String id = customerBo.generateNewId();
             if (id == null) {
                 return "C00-001";
 //                int newCustomerId = Integer.parseInt(id.replace("C00-", "")) + 1;

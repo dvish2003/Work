@@ -1,12 +1,11 @@
-package com.example.layeredarchitecture.DAO;
+package com.example.layeredarchitecture.DAO.Custom.Implement;
 
+import com.example.layeredarchitecture.DAO.Customer.OrderDAO;
+import com.example.layeredarchitecture.DAO.SQLUtil;
 import com.example.layeredarchitecture.db.DBConnection;
 import com.example.layeredarchitecture.model.OrderDTO;
-import com.example.layeredarchitecture.model.OrderDetailDTO;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.util.List;
 
 public class OrderDAOImpl implements OrderDAO {
     private Connection connection = DBConnection.getDbConnection().getConnection();
@@ -15,8 +14,8 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     public  String generateNextOrderId() throws SQLException, ClassNotFoundException {
-        Statement stm = connection.createStatement();
-        ResultSet rst = stm.executeQuery("SELECT oid FROM `Orders` ORDER BY oid DESC LIMIT 1;");
+      //  Statement stm = connection.createStatement();
+        ResultSet rst = SQLUtil.execute("SELECT oid FROM `Orders` ORDER BY oid DESC LIMIT 1;");
 
         if(rst.next()){
             return rst.getString(1);
@@ -24,13 +23,16 @@ public class OrderDAOImpl implements OrderDAO {
         return null;
     }
     public boolean CheckOrderExist(String orderId) throws SQLException, ClassNotFoundException {
-        Connection connection = DBConnection.getDbConnection().getConnection();
+        /*Connection connection = DBConnection.getDbConnection().getConnection();
         PreparedStatement stm = connection.prepareStatement("SELECT oid FROM `Orders` WHERE oid=?");
         stm.setString(1, orderId);
-        return stm.executeQuery().next();
+        return stm.executeQuery().next();*/
+
+        ResultSet rst = SQLUtil.execute("SELECT oid FROM `Orders` WHERE oid=?",orderId);
+        return rst.next();
     }
 
-    public boolean OrderSave(OrderDTO orderDTO, List<OrderDetailDTO> orderDetails) throws SQLException, ClassNotFoundException {
+    /*public boolean OrderSave(OrderDTO orderDTO) throws SQLException, ClassNotFoundException {
        OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
         connection = DBConnection.getDbConnection().getConnection();
        PreparedStatement stm;
@@ -55,6 +57,12 @@ public class OrderDAOImpl implements OrderDAO {
         }connection.rollback();
         connection.setAutoCommit(true);
         return false;
+    }*/
+
+    public boolean OrderSave(OrderDTO orderDTO) throws SQLException, ClassNotFoundException {
+        // OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
+
+        return SQLUtil.execute("INSERT INTO `Orders` (oid, date, customerID) VALUES (?,?,?)",orderDTO.getOrderId(),orderDTO.getOrderDate(),orderDTO.getCustomerId());
     }
 }
 

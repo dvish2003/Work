@@ -1,8 +1,9 @@
 package com.example.layeredarchitecture.controller;
 
-import com.example.layeredarchitecture.DAO.ItemDAO;
-import com.example.layeredarchitecture.DAO.ItemDAOImpl;
-import com.example.layeredarchitecture.db.DBConnection;
+import com.example.layeredarchitecture.BO.ItemBo;
+import com.example.layeredarchitecture.BO.ItemBoImpl;
+import com.example.layeredarchitecture.DAO.Customer.ItemDAO;
+import com.example.layeredarchitecture.DAO.Custom.Implement.ItemDAOImpl;
 import com.example.layeredarchitecture.model.ItemDTO;
 import com.example.layeredarchitecture.view.tdm.ItemTM;
 import com.jfoenix.controls.JFXButton;
@@ -37,8 +38,11 @@ public class ManageItemsFormController {
     public TableView<ItemTM> tblItems;
     public TextField txtUnitPrice;
     public JFXButton btnAddNewItem;
-    ItemDAO itemDAO = new ItemDAOImpl();
 
+    //ItemDAO itemDAO = new ItemDAOImpl();
+
+    // Business layer
+    ItemBo itemBo = new ItemBoImpl();
     public void initialize() {
         tblItems.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("code"));
         tblItems.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -77,7 +81,7 @@ public class ManageItemsFormController {
             Statement stm = connection.createStatement();
             ResultSet rst = stm.executeQuery("SELECT * FROM Item");*/
 
-            ArrayList<ItemDTO> allItem = itemDAO.getAllItem();
+            ArrayList<ItemDTO> allItem = itemBo.getAllItem();
             for(ItemDTO itemDTO : allItem){
                 tblItems.getItems().add(new ItemTM(itemDTO.getCode(),itemDTO.getDescription(),itemDTO.getUnitPrice(),itemDTO.getQtyOnHand()));
             }
@@ -139,7 +143,7 @@ public class ManageItemsFormController {
             if (!existItem(code)) {
                 new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
             }
-            itemDAO.delete(code);
+            itemBo.delete(code);
         /*    Connection connection = DBConnection.getDbConnection().getConnection();
             PreparedStatement pstm = connection.prepareStatement("DELETE FROM Item WHERE code=?");
             pstm.setString(1, code);
@@ -181,10 +185,10 @@ public class ManageItemsFormController {
 
         if (btnSave.getText().equalsIgnoreCase("save")) {
             try {
-                if (existItem(code)) {
+                if (!existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, code + " already exists").show();
                 }
-                itemDAO.save(itemDTO);
+                itemBo.save(itemDTO);
                 //Save Item
                /* Connection connection = DBConnection.getDbConnection().getConnection();
                 PreparedStatement pstm = connection.prepareStatement("INSERT INTO Item (code, description, unitPrice, qtyOnHand) VALUES (?,?,?,?)");
@@ -202,7 +206,7 @@ public class ManageItemsFormController {
             }
         } else {
             try {
-                itemDAO.update(itemDTO);
+                itemBo.update(itemDTO);
                 if (!existItem(code)) {
                     new Alert(Alert.AlertType.ERROR, "There is no such item associated with the id " + code).show();
                 }
@@ -238,8 +242,8 @@ public class ManageItemsFormController {
         PreparedStatement pstm = connection.prepareStatement("SELECT code FROM Item WHERE code=?");
         pstm.setString(1, code);
         return pstm.executeQuery().next();*/
-        itemDAO.exist(code);
-        return false;
+        itemBo.exist(code);
+        return true;
 
     }
 
@@ -248,7 +252,7 @@ public class ManageItemsFormController {
         try {
          /*   Connection connection = DBConnection.getDbConnection().getConnection();
             ResultSet rst = connection.createStatement().executeQuery("SELECT code FROM Item ORDER BY code DESC LIMIT 1;");*/
-                String id = itemDAO.generateNextId();
+                String id = itemBo.generateNewId();
             if (id == null ) {
                 return "I00-001";
 
